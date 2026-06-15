@@ -4,10 +4,23 @@
 
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
-import App from '../App';
+
+jest.mock('../src/services/api', () => ({
+  getProducts: jest.fn(() => Promise.resolve([])),
+}));
+
+const { getProducts } = require('../src/services/api');
+const App = require('../App').default;
 
 test('renders correctly', async () => {
-  await ReactTestRenderer.act(() => {
-    ReactTestRenderer.create(<App />);
+  (getProducts as jest.Mock).mockResolvedValue([]);
+
+  let tree;
+
+  await ReactTestRenderer.act(async () => {
+    tree = ReactTestRenderer.create(<App />);
+    await Promise.resolve();
   });
+
+  expect(tree).toBeTruthy();
 });
