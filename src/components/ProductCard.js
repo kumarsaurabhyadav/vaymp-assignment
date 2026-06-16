@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-const ProductCard = ({ item }) => {
+const ProductCard = ({ item, liked = false, onToggleLike }) => {
   const originalPrice = Math.round(item.price * 85 * 2.8);
   const salePrice = Math.round(item.price * 85);
   const discount = Math.round(
@@ -23,11 +23,20 @@ const ProductCard = ({ item }) => {
           resizeMode="contain"
         />
 
-        <Image
-          source={require('../../assets/heart.png')}
-          style={styles.wishlistIcon}
-          resizeMode="contain"
-        />
+        <TouchableOpacity
+          style={styles.wishlistButton}
+          onPress={() => onToggleLike?.(item)}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={require('../assets/heart.png')}
+            style={[
+              styles.wishlistIcon,
+              { tintColor: liked ? '#EF4444' : '#A0A0A0' },
+            ]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.brand} numberOfLines={1}>
@@ -72,13 +81,18 @@ const styles = StyleSheet.create({
     width: '85%',
     height: '85%',
   },
-  wishlistIcon: {
+  wishlistButton: {
     position: 'absolute',
-    top: 14,
-    right: 14,
-    width: 28,
-    height: 28,
-    tintColor: '#A0A0A0',
+    top: 10,
+    right: 10,
+    width: 34,
+    height: 34,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wishlistIcon: {
+    width: 24,
+    height: 24,
   },
   brand: {
     fontSize: 18,

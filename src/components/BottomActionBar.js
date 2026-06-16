@@ -6,7 +6,7 @@ const BottomActionBar = ({ onSortPress, onFilterPress }) => {
     <View style={styles.bottomActionBar}>
       <TouchableOpacity style={styles.actionButton} onPress={onSortPress}>
         <Image
-          source={require('../../assets/Vector.png')}
+          source={require('../assets/Vector.png')}
           style={styles.icon}
           resizeMode="contain"
         />
@@ -17,7 +17,7 @@ const BottomActionBar = ({ onSortPress, onFilterPress }) => {
 
       <TouchableOpacity style={styles.actionButton} onPress={onFilterPress}>
         <Image
-          source={require('../../assets/Vector-2.png')}
+          source={require('../assets/Vector-2.png')}
           style={styles.icon}
           resizeMode="contain"
         />

@@ -51,7 +51,10 @@ const SortModal = ({ visible, onClose, selectedSort, onSelectSort }) => {
             <TouchableOpacity
               key={option.id}
               style={styles.optionRow}
-              onPress={() => onSelectSort(option.id)}
+              onPress={() => {
+                onSelectSort(option.id);
+                onClose();
+              }}
             >
               <Text style={styles.optionLabel}>{option.label}</Text>
             </TouchableOpacity>
