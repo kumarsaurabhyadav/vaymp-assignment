@@ -23,7 +23,7 @@ const ProductsScreen = ({ onOpenDetail, onOpenBag, bagCount = 0, onOpenLiked, li
   const [filterVisible, setFilterVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState('featured');
+  const [sortOption, setSortOption] = useState('newest');
   const [activeFilters, setActiveFilters] = useState({});
 
   const priceInRupees = (price) => price * 85;
@@ -125,6 +125,11 @@ const ProductsScreen = ({ onOpenDetail, onOpenBag, bagCount = 0, onOpenLiked, li
 
   const sortedProducts = useMemo(() => {
     const items = [...filteredProducts];
+    const discountPercent = (product) => {
+      const salePrice = Math.round(product.price * 85);
+      const originalPrice = Math.round(product.price * 85 * 2.8);
+      return ((originalPrice - salePrice) / originalPrice) * 100;
+    };
 
     if (sortOption === 'lowToHigh') {
       return items.sort((a, b) => a.price - b.price);
@@ -134,8 +139,16 @@ const ProductsScreen = ({ onOpenDetail, onOpenBag, bagCount = 0, onOpenLiked, li
       return items.sort((a, b) => b.price - a.price);
     }
 
-    if (sortOption === 'rating') {
-      return items.sort((a, b) => (b.rating?.rate || 0) - (a.rating?.rate || 0));
+    if (sortOption === 'newest') {
+      return items.sort((a, b) => b.id - a.id);
+    }
+
+    if (sortOption === 'offers') {
+      return items.sort((a, b) => discountPercent(b) - discountPercent(a));
+    }
+
+    if (sortOption === 'bestSellers') {
+      return items.sort((a, b) => (b.rating?.count || 0) - (a.rating?.count || 0));
     }
 
     return items;
@@ -251,9 +264,10 @@ const ProductsScreen = ({ onOpenDetail, onOpenBag, bagCount = 0, onOpenLiked, li
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <ProductCard
             item={item}
+            colorIndex={index}
             liked={!!likedMap[item.id]}
             onToggleLike={onToggleLike}
             onPress={() => onOpenDetail?.(item)}
@@ -268,10 +282,8 @@ const ProductsScreen = ({ onOpenDetail, onOpenBag, bagCount = 0, onOpenLiked, li
 
       <SortModal
         visible={sortVisible}
-        selectedSort={sortOption}
         onSelectSort={setSortOption}
         onClose={() => setSortVisible(false)}
-        onApply={() => setSortVisible(false)}
       />
 
       <FilterModal

@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { getProductImageBackground } from '../constants/productImageColors';
 
-const ProductCard = ({ item, liked = false, onToggleLike, onPress }) => {
+const ProductCard = ({ item, liked = false, onToggleLike, onPress, colorIndex = 0 }) => {
+  const imageBackground = getProductImageBackground(colorIndex);
   const originalPrice = Math.round(item.price * 85 * 2.8);
   const salePrice = Math.round(item.price * 85);
   const discount = Math.round(
@@ -16,7 +18,7 @@ const ProductCard = ({ item, liked = false, onToggleLike, onPress }) => {
 
   return (
     <TouchableOpacity style={styles.productCard} onPress={onPress} activeOpacity={0.9}>
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, { backgroundColor: imageBackground }]}>
         <Image
           source={{ uri: item.image }}
           style={styles.productImage}
@@ -72,7 +74,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     height: 250,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',

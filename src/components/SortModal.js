@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Dimensions,
 } from 'react-native';
 
 let BlurView = null;
@@ -16,15 +17,22 @@ try {
   BlurView = null;
 }
 
+const SORT_MODAL_WIDTH = 412;
+const SORT_MODAL_HEIGHT = 296;
+const SORT_MODAL_TOP_RADIUS = 20;
+
+const { width: screenWidth } = Dimensions.get('window');
+const modalWidth = Math.min(screenWidth, SORT_MODAL_WIDTH);
+
 const SORT_OPTIONS = [
   { id: 'newest', label: 'Newest arrivals' },
   { id: 'lowToHigh', label: 'Price - low to high' },
   { id: 'highToLow', label: 'Price - high to low' },
-  { id: 'offers', label: 'Offers and dicounts' },
+  { id: 'offers', label: 'Offers and discounts' },
   { id: 'bestSellers', label: 'Best sellers' },
 ];
 
-const SortModal = ({ visible, onClose, selectedSort, onSelectSort }) => {
+const SortModal = ({ visible, onClose, onSelectSort }) => {
   return (
     <Modal
       visible={visible}
@@ -47,18 +55,21 @@ const SortModal = ({ visible, onClose, selectedSort, onSelectSort }) => {
         <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
           <Text style={styles.title}>Sort by</Text>
 
-          {SORT_OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.id}
-              style={styles.optionRow}
-              onPress={() => {
-                onSelectSort(option.id);
-                onClose();
-              }}
-            >
-              <Text style={styles.optionLabel}>{option.label}</Text>
-            </TouchableOpacity>
-          ))}
+          <View style={styles.optionsList}>
+            {SORT_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option.id}
+                style={styles.optionRow}
+                onPress={() => {
+                  onSelectSort(option.id);
+                  onClose();
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.optionLabel}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </Pressable>
       </Pressable>
     </Modal>
@@ -69,32 +80,41 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.18)',
   },
   backdropOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(0,0,0,0.65)',
   },
   sheet: {
-    width: '100%',
-    height: 296,
-    backgroundColor: '#F5F5F5',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 32,
-    paddingTop: 28,
-    paddingBottom: 40,
+    width: modalWidth,
+    height: SORT_MODAL_HEIGHT,
+    backgroundColor: '#FAFAFA',
+    borderTopLeftRadius: SORT_MODAL_TOP_RADIUS,
+    borderTopRightRadius: SORT_MODAL_TOP_RADIUS,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingHorizontal: 8,
+    overflow: 'hidden',
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    elevation: 16,
   },
   title: {
     fontSize: 20,
     lineHeight: 20,
     fontWeight: '600',
     color: '#4342FF',
-    marginBottom: 18,
-    fontFamily: 'LeagueSpartan-SemiBold',
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  optionsList: {
+    flex: 1,
   },
   optionRow: {
-    paddingVertical: 10,
+    flex: 1,
+    paddingHorizontal: 8,
     justifyContent: 'center',
   },
   optionLabel: {
@@ -102,8 +122,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#29292C',
     fontWeight: '400',
-    fontFamily: 'LeagueSpartan-Regular',
-    letterSpacing: 0,
   },
 });
 

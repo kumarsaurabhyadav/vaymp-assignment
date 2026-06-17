@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Pressable,
   Dimensions,
-  ScrollView,
 } from 'react-native';
 
 let BlurView = null;
@@ -45,6 +44,13 @@ const FILTER_CONTENT = {
   Discounts: ['10% off', '25% off', '50% off'],
   'Delivery time': ['1 day', '2 days', 'Within a week'],
 };
+
+const FILTER_MODAL_WIDTH = 412;
+const FILTER_MODAL_HEIGHT = 632;
+const FILTER_MODAL_TOP_RADIUS = 20;
+
+const { width: screenWidth } = Dimensions.get('window');
+const modalWidth = Math.min(screenWidth, FILTER_MODAL_WIDTH);
 
 const FilterModal = ({ visible, onClose, onApply, initialFilters }) => {
   const [selectedTab, setSelectedTab] = useState(TABS[0]);
@@ -98,12 +104,8 @@ const FilterModal = ({ visible, onClose, onApply, initialFilters }) => {
           <Text style={styles.heading}>Filters</Text>
 
           <View style={styles.modalBody}>
-            {/* Left Tab Column Container */}
             <View style={styles.tabColumnContainer}>
-              <ScrollView 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.tabScrollContent}
-              >
+              <View style={styles.tabList}>
                 {TABS.map((tab) => {
                   const active = tab === selectedTab;
                   return (
@@ -113,54 +115,56 @@ const FilterModal = ({ visible, onClose, onApply, initialFilters }) => {
                       onPress={() => setSelectedTab(tab)}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
+                      <Text
+                        style={[styles.tabLabel, active && styles.tabLabelActive]}
+                        numberOfLines={2}
+                      >
                         {tab}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
-              </ScrollView>
+              </View>
             </View>
 
-            {/* FIXED: Right Options Content Column with ScrollView wrapper */}
             <View style={styles.contentColumn}>
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={styles.sectionTitle}>
-                  {selectedTab === 'Gender'
-                    ? 'Select gender'
-                    : selectedTab === 'Price'
-                    ? 'Select price range'
-                    : selectedTab === 'Fit'
-                    ? 'Select fit'
-                    : selectedTab === 'Color'
-                    ? 'Select color'
-                    : selectedTab === 'Discounts'
-                    ? 'Select discounts'
-                    : selectedTab === 'Delivery time'
-                    ? 'Select delivery time'
-                    : `Select ${selectedTab.toLowerCase()}`}
-                </Text>
+              <Text style={styles.sectionTitle}>
+                {selectedTab === 'Suggested filters'
+                  ? 'Choose from the mostly used filters'
+                  : selectedTab === 'Gender'
+                  ? 'Select gender'
+                  : selectedTab === 'Price'
+                  ? 'Select price range'
+                  : selectedTab === 'Fit'
+                  ? 'Select fit'
+                  : selectedTab === 'Color'
+                  ? 'Select color'
+                  : selectedTab === 'Discounts'
+                  ? 'Select discounts'
+                  : selectedTab === 'Delivery time'
+                  ? 'Select delivery time'
+                  : `Select ${selectedTab.toLowerCase()}`}
+              </Text>
 
-                <View style={styles.optionGroup}>
-                  {options.map((option) => {
-                    const selected = selectedOptions.includes(option);
-                    return (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionPill,
-                          selected ? styles.optionPillSelected : null,
-                        ]}
-                        onPress={() => toggleOption(option)}
-                      >
-                        <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
-                          {option}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </ScrollView>
+              <View style={styles.optionGroup}>
+                {options.map((option) => {
+                  const selected = selectedOptions.includes(option);
+                  return (
+                    <TouchableOpacity
+                      key={option}
+                      style={[
+                        styles.optionPill,
+                        selected ? styles.optionPillSelected : null,
+                      ]}
+                      onPress={() => toggleOption(option)}
+                    >
+                      <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
+                        {option}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
           </View>
 
@@ -185,27 +189,27 @@ const FilterModal = ({ visible, onClose, onApply, initialFilters }) => {
   );
 };
 
-const { height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.18)',
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   backdropOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.65)',
   },
   sheet: {
-    height: height * 0.75, 
-    width: '100%',
+    height: FILTER_MODAL_HEIGHT,
+    width: modalWidth,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingBottom: 20,
-    paddingTop: 24,
+    backgroundColor: '#FAFAFA',
+    borderTopLeftRadius: FILTER_MODAL_TOP_RADIUS,
+    borderTopRightRadius: FILTER_MODAL_TOP_RADIUS,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingHorizontal: 8,
     shadowOpacity: 0.18,
     shadowRadius: 24,
     elevation: 16,
@@ -213,9 +217,9 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#4342FF', 
+    color: '#4342FF',
     marginBottom: 16,
-    paddingHorizontal: 24,
+    paddingHorizontal: 8,
   },
   modalBody: {
     flexDirection: 'row',
@@ -224,28 +228,28 @@ const styles = StyleSheet.create({
     borderTopColor: '#EBEBEB',
   },
   tabColumnContainer: {
-    width: 140, 
-    backgroundColor: '#F0F2F4', 
+    width: 140,
+    backgroundColor: '#F0F2F4',
   },
-  tabScrollContent: {
-    paddingBottom: 20,
+  tabList: {
+    flex: 1,
   },
   tabItem: {
-    height: 51, 
-    paddingHorizontal: 16,
+    flex: 1,
+    paddingHorizontal: 12,
     justifyContent: 'center',
     backgroundColor: '#F0F2F4',
     borderLeftWidth: 4,
     borderLeftColor: 'transparent',
   },
   tabItemActive: {
-    backgroundColor: '#FFFFFF',
-    borderLeftColor: '#4342FF', 
+    backgroundColor: '#FAFAFA',
+    borderLeftColor: '#4342FF',
   },
   tabLabel: {
-    fontSize: 18, 
+    fontSize: 15,
     color: '#333333',
-    fontWeight: '400', 
+    fontWeight: '400',
   },
   tabLabelActive: {
     color: '#4342FF',
@@ -253,10 +257,11 @@ const styles = StyleSheet.create({
   },
   contentColumn: {
     flex: 1,
-    paddingTop: 18,
-    paddingLeft: 12,
-    paddingRight: 12,
-    backgroundColor: '#FFFFFF',
+    paddingTop: 16,
+    paddingLeft: 8,
+    paddingRight: 8,
+    backgroundColor: '#FAFAFA',
+    overflow: 'hidden',
   },
   sectionTitle: {
     fontSize: 15,
@@ -268,7 +273,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
-    paddingBottom: 20, // Scroll safe area padding
   },
   optionPill: {
     height: 28,
@@ -276,7 +280,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -284,9 +288,8 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   optionPillSelected: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#4342FF', 
-    borderWidth: 1,
+    backgroundColor: '#4342FF',
+    borderColor: '#4342FF',
   },
   optionText: {
     fontSize: 13,
@@ -294,16 +297,16 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   optionTextSelected: {
-    color: '#4342FF',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   footerRow: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
+    paddingHorizontal: 8,
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAFAFA',
   },
   clearButton: {
     flex: 1,
@@ -316,7 +319,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   clearText: {
-    color: '#1F2937',
+    color: '#4342FF',
     fontWeight: '600',
     fontSize: 14,
   },

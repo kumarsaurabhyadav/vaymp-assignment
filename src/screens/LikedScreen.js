@@ -40,9 +40,10 @@ const LikedScreen = ({ items, onBack, onToggleLike }) => {
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <ProductCard
               item={item}
+              colorIndex={index}
               liked
               onToggleLike={onToggleLike}
             />
