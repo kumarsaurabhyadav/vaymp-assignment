@@ -16,7 +16,7 @@ import BottomActionBar from '../components/BottomActionBar';
 import SortModal from '../components/SortModal';
 import FilterModal from '../components/FilterModal';
 
-const ProductsScreen = ({ onOpenLiked, likedMap = {}, likedCount = 0, onToggleLike }) => {
+const ProductsScreen = ({ onOpenDetail, onOpenBag, bagCount = 0, onOpenLiked, likedMap = {}, likedCount = 0, onToggleLike }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortVisible, setSortVisible] = useState(false);
@@ -189,11 +189,18 @@ const ProductsScreen = ({ onOpenLiked, likedMap = {}, likedCount = 0, onToggleLi
               </View>
             )}
           </TouchableOpacity>
-          <Image
-            source={require('../assets/bag.png')}
-            style={styles.actionIcon}
-            resizeMode="contain"
-          />
+          <TouchableOpacity onPress={onOpenBag} style={styles.iconButton}>
+            <Image
+              source={require('../assets/bag.png')}
+              style={styles.actionIcon}
+              resizeMode="contain"
+            />
+            {bagCount > 0 && (
+              <View style={styles.bagBadge}>
+                <Text style={styles.bagBadgeText}>{bagCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -249,6 +256,7 @@ const ProductsScreen = ({ onOpenLiked, likedMap = {}, likedCount = 0, onToggleLi
             item={item}
             liked={!!likedMap[item.id]}
             onToggleLike={onToggleLike}
+            onPress={() => onOpenDetail?.(item)}
           />
         )}
       />
@@ -363,6 +371,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   heartBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  bagBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#4342FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  bagBadgeText: {
     color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '700',

@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-const ProductCard = ({ item, liked = false, onToggleLike }) => {
+const ProductCard = ({ item, liked = false, onToggleLike, onPress }) => {
   const originalPrice = Math.round(item.price * 85 * 2.8);
   const salePrice = Math.round(item.price * 85);
   const discount = Math.round(
@@ -15,7 +15,7 @@ const ProductCard = ({ item, liked = false, onToggleLike }) => {
   );
 
   return (
-    <View style={styles.productCard}>
+    <TouchableOpacity style={styles.productCard} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: item.image }}
@@ -59,7 +59,7 @@ const ProductCard = ({ item, liked = false, onToggleLike }) => {
         <Text style={styles.originalPrice}>₹{originalPrice}</Text>
         <Text style={styles.discountText}>{discount}% OFF</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
