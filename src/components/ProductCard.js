@@ -6,15 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { getSalePrice, getOriginalPrice, getDiscountPercent } from '../utils/pricing';
+import { colors } from '../constants/colors';
 import { getProductImageBackground } from '../constants/productImageColors';
 
 const ProductCard = ({ item, liked = false, onToggleLike, onPress, colorIndex = 0 }) => {
   const imageBackground = getProductImageBackground(colorIndex);
-  const originalPrice = Math.round(item.price * 85 * 2.8);
-  const salePrice = Math.round(item.price * 85);
-  const discount = Math.round(
-    ((originalPrice - salePrice) / originalPrice) * 100,
-  );
+  const salePrice = getSalePrice(item.price);
+  const originalPrice = getOriginalPrice(item.price);
+  const discount = getDiscountPercent(item.price);
 
   return (
     <TouchableOpacity style={styles.productCard} onPress={onPress} activeOpacity={0.9}>
@@ -34,7 +34,7 @@ const ProductCard = ({ item, liked = false, onToggleLike, onPress, colorIndex = 
             source={require('../assets/heart.png')}
             style={[
               styles.wishlistIcon,
-              { tintColor: liked ? '#EF4444' : '#A0A0A0' },
+              { tintColor: liked ? colors.error : colors.heartInactive },
             ]}
             resizeMode="contain"
           />
@@ -52,9 +52,13 @@ const ProductCard = ({ item, liked = false, onToggleLike, onPress, colorIndex = 
       <View style={styles.priceRow}>
         <Text style={styles.salePrice}>₹{salePrice}</Text>
 
-        <TouchableOpacity style={styles.tryBuyButton}>
-          <Text style={styles.tryBuyText}>TRY N BUY</Text>
-        </TouchableOpacity>
+        <View style={styles.tryBuyBadge}>
+          <Image
+            source={require('../assets/Group 5.png')}
+            style={styles.tryBuyImage}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
       <View style={styles.discountRow}>
@@ -118,14 +122,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#222',
   },
-  tryBuyButton: {
+  tryBuyBadge: {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  tryBuyText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#666',
+  tryBuyImage: {
+    width: 64,
+    height: 14,
   },
   discountRow: {
     flexDirection: 'row',
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
   discountText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#4F46E5',
+    color: colors.discount,
   },
 });
 

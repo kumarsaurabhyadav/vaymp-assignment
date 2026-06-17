@@ -8,42 +8,53 @@ import {
   FlatList,
   Platform,
 } from 'react-native';
+import { getSalePrice, getOriginalPrice } from '../utils/pricing';
 
 const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
-  const [selectedItems, setSelectedItems] = useState(items.map(() => true));
+  const [selectedItems, setSelectedItems] = useState({});
 
   useEffect(() => {
     setSelectedItems((prev) => {
-      if (items.length === prev.length) return prev;
-      if (items.length < prev.length) return items.map(() => true);
-      return [...prev, ...items.slice(prev.length).map(() => true)];
-    });
-  }, [items.length]);
+      const next = { ...prev };
 
-  const handleSelectItem = (index) => {
-    const newSelected = [...selectedItems];
-    newSelected[index] = !newSelected[index];
-    setSelectedItems(newSelected);
+      items.forEach((item) => {
+        if (next[item.bagId] === undefined) {
+          next[item.bagId] = true;
+        }
+      });
+
+      Object.keys(next).forEach((bagId) => {
+        if (!items.some((item) => item.bagId === bagId)) {
+          delete next[bagId];
+        }
+      });
+
+      return next;
+    });
+  }, [items]);
+
+  const handleSelectItem = (bagId) => {
+    setSelectedItems((prev) => ({ ...prev, [bagId]: !prev[bagId] }));
   };
 
   const handleToggleSelectAll = () => {
-    const allSelected = selectedItems.every(s => s);
-    setSelectedItems(items.map(() => !allSelected));
+    const allSelected = items.length > 0 && items.every((item) => selectedItems[item.bagId]);
+    setSelectedItems(Object.fromEntries(items.map((item) => [item.bagId, !allSelected])));
   };
 
-  const handleQuantityChange = (index, currentQty, operation) => {
+  const handleQuantityChange = (bagId, currentQty, operation) => {
     if (operation === 'plus') {
-      onUpdateQuantity?.(index, currentQty + 1);
+      onUpdateQuantity?.(bagId, currentQty + 1);
     } else if (operation === 'minus') {
       if (currentQty > 1) {
-        onUpdateQuantity?.(index, currentQty - 1);
+        onUpdateQuantity?.(bagId, currentQty - 1);
       } else {
-        onRemoveItem?.(index);
+        onRemoveItem?.(bagId);
       }
     }
   };
 
-  const isAllSelected = selectedItems.length > 0 && selectedItems.every(s => s);
+  const isAllSelected = items.length > 0 && items.every((item) => selectedItems[item.bagId]);
 
   return (
     <View style={styles.container}>
@@ -86,7 +97,7 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
       ) : (
         <FlatList
           data={items}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(item) => item.bagId}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
@@ -127,9 +138,10 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
               </TouchableOpacity>
             </>
           }
-          renderItem={({ item, index }) => {
-            const salePrice = Math.round(item.price * 85);
-            const originalPrice = Math.round(item.price * 85 * 2.8);
+          renderItem={({ item }) => {
+            const salePrice = getSalePrice(item.price);
+            const originalPrice = getOriginalPrice(item.price);
+            const isSelected = !!selectedItems[item.bagId];
 
             return (
               <View style={styles.bagItem}>
@@ -137,12 +149,12 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
                   <TouchableOpacity
                     style={[
                       styles.itemCheckbox,
-                      selectedItems[index] && styles.checkboxChecked,
+                      isSelected && styles.checkboxChecked,
                     ]}
-                    onPress={() => handleSelectItem(index)}
+                    onPress={() => handleSelectItem(item.bagId)}
                     activeOpacity={0.8}
                   >
-                    {selectedItems[index] && <Text style={styles.checkboxMark}>✓</Text>}
+                    {isSelected && <Text style={styles.checkboxMark}>✓</Text>}
                   </TouchableOpacity>
 
                   <Image
@@ -178,7 +190,7 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
                     <View style={styles.quantitySelector}>
                       <TouchableOpacity
                         style={styles.qtyButton}
-                        onPress={() => handleQuantityChange(index, item.quantity, 'minus')}
+                        onPress={() => handleQuantityChange(item.bagId, item.quantity, 'minus')}
                         activeOpacity={0.6}
                       >
                         {item.quantity === 1 ? (
@@ -200,7 +212,7 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
                       
                       <TouchableOpacity
                         style={styles.qtyButton}
-                        onPress={() => handleQuantityChange(index, item.quantity, 'plus')}
+                        onPress={() => handleQuantityChange(item.bagId, item.quantity, 'plus')}
                         activeOpacity={0.6}
                       >
                         <Image 

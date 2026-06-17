@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Alert,
 } from 'react-native';
 import ProductDetailView from '../components/ProductDetailView';
 

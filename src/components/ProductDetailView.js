@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { getSalePrice, getOriginalPrice, getDiscountPercent } from '../utils/pricing';
 
 const ProductDetailView = ({
   product,
@@ -9,9 +10,9 @@ const ProductDetailView = ({
   onDecreaseQuantity,
   onIncreaseQuantity,
 }) => {
-  const originalPrice = Math.round(product.price * 85 * 2.8);
-  const salePrice = Math.round(product.price * 85);
-  const discount = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+  const salePrice = getSalePrice(product.price);
+  const originalPrice = getOriginalPrice(product.price);
+  const discount = getDiscountPercent(product.price);
 
   const sizes = ['S', 'M', 'L', 'XL'];
 

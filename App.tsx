@@ -32,16 +32,16 @@ function App() {
     setBagItems((prev) => [...prev, newItem]);
   };
 
-  const handleRemoveFromBag = (index: number) => {
-    setBagItems((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveFromBag = (bagId: string) => {
+    setBagItems((prev) => prev.filter((item) => item.bagId !== bagId));
   };
 
-  const handleUpdateBagQuantity = (index: number, newQuantity: number) => {
-    setBagItems((prev) => {
-      const updated = [...prev];
-      updated[index].quantity = newQuantity;
-      return updated;
-    });
+  const handleUpdateBagQuantity = (bagId: string, newQuantity: number) => {
+    setBagItems((prev) =>
+      prev.map((item) =>
+        item.bagId === bagId ? { ...item, quantity: newQuantity } : item,
+      ),
+    );
   };
 
   const likedList = Object.values(likedItems);
