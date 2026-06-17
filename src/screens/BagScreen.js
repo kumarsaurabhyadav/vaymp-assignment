@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,14 @@ import {
 
 const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
   const [selectedItems, setSelectedItems] = useState(items.map(() => true));
+
+  useEffect(() => {
+    setSelectedItems((prev) => {
+      if (items.length === prev.length) return prev;
+      if (items.length < prev.length) return items.map(() => true);
+      return [...prev, ...items.slice(prev.length).map(() => true)];
+    });
+  }, [items.length]);
 
   const handleSelectItem = (index) => {
     const newSelected = [...selectedItems];
@@ -59,8 +67,21 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
 
       {items.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>Your bag is empty</Text>
-          <Text style={styles.emptySubText}>Add items to continue shopping</Text>
+          <Text style={styles.oopsText}>OOPS ☹</Text>
+          <Text style={styles.emptyHeading}>Your bag is empty.</Text>
+          <Image
+            source={require('../assets/empty.png')}
+            style={styles.emptyImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.emptySubText}>Add items to your bag now</Text>
+          <TouchableOpacity
+            style={styles.startShoppingButton}
+            onPress={onBack}
+            activeOpacity={0.9}
+          >
+            <Text style={styles.startShoppingText}>Start shopping</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -107,8 +128,8 @@ const BagScreen = ({ items = [], onBack, onRemoveItem, onUpdateQuantity }) => {
             </>
           }
           renderItem={({ item, index }) => {
-            const originalPrice = Math.round(item.price * 1.4);
-            const salePrice = Math.round(item.price);
+            const salePrice = Math.round(item.price * 85);
+            const originalPrice = Math.round(item.price * 85 * 2.8);
 
             return (
               <View style={styles.bagItem}>
@@ -258,18 +279,54 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 48,
+  },
+  oopsText: {
+    fontFamily: Platform.OS === 'ios' ? 'League Spartan' : 'sans-serif-medium',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#29292C',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptyHeading: {
+    fontFamily: Platform.OS === 'ios' ? 'League Spartan' : 'sans-serif-medium',
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#29292C',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  emptyImage: {
+    width: 226,
+    height: 226,
+    opacity: 0.3,
+    marginBottom: 24,
+  },
+  emptySubText: {
+    fontFamily: Platform.OS === 'ios' ? 'League Spartan' : 'sans-serif-medium',
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#29292C',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 28,
+  },
+  startShoppingButton: {
+    width: 246,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#4342FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  emptySubText: {
-    fontSize: 14,
-    color: '#9CA3AF',
+  startShoppingText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   deliveryInfo: {
     flexDirection: 'row',
